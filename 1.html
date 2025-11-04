@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Nude Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        :root {
+            --primary-color: #FF69B4;
+            --primary-dark: #FF1493;
+            --primary-light: #FFC0CB;
+            --accent-color: #FF85A2;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes slideIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes glowing {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            50% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--primary-dark); }
+            100% { box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffebf2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 25px 0;
+            box-shadow: 0px 5px 15px rgba(255, 105, 180, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 42px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .main-container {
+            width: 90%;
+            max-width: 850px;
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0px 10px 30px rgba(255, 105, 180, 0.2);
+            animation: slideIn 0.6s ease-out forwards;
+            transform-origin: center top;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 70%, var(--primary-light) 70%);
+            z-index: 1;
+        }
+        
+        .upload-section {
+            text-align: center;
+            padding: 30px;
+            border: 3px dashed var(--primary-light);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            background-color: rgba(255, 192, 203, 0.05);
+        }
+        
+        .upload-section:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.1);
+        }
+        
+        .upload-section h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .upload-button {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0px 4px 10px rgba(255, 20, 147, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .upload-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 7px 15px rgba(255, 20, 147, 0.4);
+        }
+        
+        .upload-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+        
+        .upload-button:hover::after {
+            left: 100%;
+        }
+        
+        #imagePreview {
+            max-width: 100%;
+            max-height: 350px;
+            margin: 20px 0;
+            display: none;
+            border-radius: 10px;
+            box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .options-section {
+            margin-top: 30px;
+            animation: slideIn 0.8s ease-out forwards;
+        }
+        
+        .option-group {
+            margin-bottom: 25px;
+            background-color: rgba(255, 192, 203, 0.05);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .option-group:hover {
+            background-color: rgba(255, 192, 203, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .option-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            font-size: 18px;
+        }
+        
+        .option-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .option-button {
+            background-color: #f8f8f8;
+            border: 2px solid #eee;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-button:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+        
+        .option-button.selected {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border-color: var(--primary-dark);
+            box-shadow: 0px 4px 8px rgba(255, 20, 147, 0.25);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .generate-button {
+            background: linear-gradient(45deg, #ff0066, #ff4d94);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 30px;
+            box-shadow: 0px 8px 20px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: glowing 2.5s infinite;
+        }
+        
+        .generate-button:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+        
+        .generate-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transition: all 0.5s ease;
+        }
+        
+        .generate-button:hover::before {
+            left: 100%;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .progress-container {
+            width: 80%;
+            max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 25px;
+            width: 0%;
+            background: linear-gradient(45deg, #ff0066, #ff4d94, #ff85a2);
+            border-radius: 30px;
+            transition: width 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.15) 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                rgba(255,255,255,0.15) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        #progressText {
+            color: white;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+        }
+        
+        .spinner:after {
+            content: " ";
+            display: block;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 6px solid #ff4d94;
+            border-color: #ff4d94 transparent #ff4d94 transparent;
+            animation: rotate 1.5s linear infinite;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ff3366, #ff0066);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.4);
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        .error-message h3 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .error-message p {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        /* Decorative elements */
+        .floating-bubble {
+            position: absolute;
+            background-color: rgba(255, 105, 180, 0.2);
+            border-radius: 50%;
+            z-index: 0;
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        /* Add fancy effects */
+        .fancy-border {
+            position: relative;
+        }
+        
+        .fancy-border::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark), var(--accent-color), var(--primary-light));
+            z-index: -1;
+            border-radius: 25px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .fancy-border:hover::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative floating bubbles -->
+    <div class="floating-bubble" style="width: 100px; height: 100px; top: 15%; left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-bubble" style="width: 60px; height: 60px; top: 25%; right: 15%; animation-delay: 1s;"></div>
+    <div class="floating-bubble" style="width: 80px; height: 80px; bottom: 15%; left: 20%; animation-delay: 2s;"></div>
+    
+    <header class="animate__animated animate__fadeIn">
+        <h1>Welcome Nude Editor</h1>
+    </header>
+    
+    <div class="main-container fancy-border">
+        <div class="upload-section animate__animated animate__fadeInUp">
+            <h2>නිරුවත් කිරීමට අවශ්‍ය චායාරුපය දාන්න</h2>
+            <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+            <button class="upload-button" onclick="document.getElementById('photoUpload').click()">
+                Upload Photo
+            </button>
+            <img id="imagePreview" src="" alt="Preview">
+        </div>
+        
+        <div class="options-section">
+            <div class="option-group" style="animation-delay: 0.1s;">
+                <span class="option-label">Dress:</span>
+                <div class="option-buttons" id="clothing-options">
+                    <button class="option-button" data-value="gown">නිර්‍රුවත්</button>
+                    <button class="option-button" data-value="saree">sexy look</button>
+                    <button class="option-button" data-value="pants">බ්‍රා and පෑන්ටි</button>
+                </div>
+            </div>
+            
+            <div class="option-group" style="animation-delay: 0.2s;">
+                <span class="option-label">තනය:</span>
+                <div class="option-buttons" id="hair-options">
+                    <button class="option-button" data-value="long">ලොකු</button>
+                    <button class="option-button" data-value="medium">කුඩා</button>
+                    <button class="option-button" data-value="short">සාමාන්‍ය</button>
+                </div>
+            </div>
+            
+            <div class="option-group" style="animation-delay: 0.3s;">
+                <span class="option-label">මයිල්:</span>
+                <div class="option-buttons" id="color-options">
+                    <button class="option-button" data-value="white">නැතුව</button>
+                    <button class="option-button" data-value="black">ලාවට</button>
+                    <button class="option-button" data-value="normal">සාමාන්‍ය</button>
+                </div>
+            </div>
+            
+            <button class="generate-button animate__animated animate__pulse animate__infinite" id="generateButton">Generate</button>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text animate__animated animate__pulse animate__infinite">Downloading AI Tools...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div id="progressText">0%</div>
+    </div>
+    
+    <div class="error-message" id="errorMessage">
+        <div class="error-icon">❌</div>
+        <h3>ඔබේ ගිණුම තවමත් සක්‍රීය කර නොමැත..</h3>
+        <p>කරුනාකර මුදල් ගේවා ගිනුම සක්‍රිය කරගෙන උත්සහ කරන්න.</p>
+    </div>
+    
+    <script>
+        // Create floating bubbles
+        function createBubbles() {
+            const mainContainer = document.querySelector('.main-container');
+            for (let i = 0; i < 5; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'floating-bubble';
+                bubble.style.width = Math.random() * 60 + 20 + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.top = Math.random() * 100 + '%';
+                bubble.style.animationDelay = Math.random() * 5 + 's';
+                bubble.style.opacity = Math.random() * 0.3 + 0.1;
+                document.body.appendChild(bubble);
+            }
+        }
+        
+        // Create page entrance animations
+        function pageEntrance() {
+            const elements = document.querySelectorAll('.option-group');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.classList.add('animate__animated', 'animate__fadeInUp');
+                }, 200 * index);
+            });
+        }
+        
+        // Handle file upload and preview with animation
+        document.getElementById('photoUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.style.opacity = '0';
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        preview.style.opacity = '1';
+                        preview.classList.add('animate__animated', 'animate__fadeIn');
+                    }, 100);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Handle option selection with animation
+        const optionGroups = document.querySelectorAll('.option-buttons');
+        optionGroups.forEach(group => {
+            const buttons = group.querySelectorAll('.option-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove selected class from all buttons in this group
+                    buttons.forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.style.transform = '';
+                    });
+                    
+                    // Add selected class to clicked button with animation
+                    this.classList.add('selected');
+                    this.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 300);
+                });
+            });
+        });
+        
+        // Handle generate button click with enhanced animations
+        document.getElementById('generateButton').addEventListener('click', function() {
+            // Check if image is uploaded
+            const imagePreview = document.getElementById('imagePreview');
+            if (imagePreview.style.display === 'none') {
+                alert('Please upload a photo first.');
+                return;
+            }
+            
+            // Add click animation
+            this.classList.add('animate__animated', 'animate__rubberBand');
+            setTimeout(() => {
+                this.classList.remove('animate__animated', 'animate__rubberBand');
+                
+                // Show loading overlay with animation
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.opacity = '0';
+                loadingOverlay.style.display = 'flex';
+                
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '1';
+                }, 50);
+                
+                // Fake progress with smoother animation
+                let progress = 0;
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                
+                const interval = setInterval(() => {
+                    progress += 1;
+                    
+                    // Add some random fluctuations to make it look more realistic
+                    const randomFactor = (Math.random() * 0.5) - 0.25;
+                    const displayProgress = Math.min(100, Math.max(0, progress + randomFactor));
+                    
+                    progressBar.style.width = displayProgress + '%';
+                    progressText.textContent = Math.floor(displayProgress) + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        // Show error after the progress reaches 100%
+                        setTimeout(() => {
+                            // Fade out loading overlay
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'none';
+                                
+                                // Show error with animation
+                                const errorMessage = document.getElementById('errorMessage');
+                                errorMessage.style.opacity = '0';
+                                errorMessage.style.display = 'block';
+                                
+                                setTimeout(() => {
+                                    errorMessage.style.opacity = '1';
+                                    errorMessage.classList.add('animate__animated', 'animate__shakeX');
+                                    
+                                    // Hide error after 5 seconds
+                                    setTimeout(() => {
+                                        errorMessage.style.opacity = '0';
+                                        setTimeout(() => {
+                                            errorMessage.style.display = 'none';
+                                            errorMessage.classList.remove('animate__animated', 'animate__shakeX');
+                                        }, 500);
+                                    }, 5000);
+                                }, 50);
+                            }, 300);
+                        }, 500);
+                    }
+                }, 2300000000); // Takes about 23 seconds to reach 100%
+            }, 300);
+        });
+        
+        // Initialize page effects
+        document.addEventListener('DOMContentLoaded', function() {
+            createBubbles();
+            pageEntrance();
+            
+            // Add hover effects for buttons
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseover', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                button.addEventListener('mouseout', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
